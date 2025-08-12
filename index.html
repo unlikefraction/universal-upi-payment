@@ -104,6 +104,10 @@
 
     .hint{ text-align:center; font-size:12.5px; color:var(--muted) }
 
+    main{
+      margin-bottom: 3rem;
+    }
+
     @media (min-width: 760px){
       .card{ grid-template-columns: 1.2fr .9fr; align-items:center }
       .grid{ grid-template-columns: 1fr }
@@ -151,7 +155,7 @@
     <div style="margin:1rem auto;max-width:680px;padding:1rem;border:1px solid #e2e8f0;border-radius:12px;background:#fff">Please enable JavaScript to view the UPI QR code.</div>
   </noscript>
 
-  <div id="testChip" title="Self‑tests"></div>
+  <div style="display: none;" id="testChip" title="Self‑tests"></div>
 
   <script>
     // -------------------- Config & helpers --------------------
