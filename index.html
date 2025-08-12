@@ -1,246 +1,271 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPI Payment</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pay via UPI — Siddha Annam</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#fff8ea; /* warm base */
+      --ink:#1f2937;
+      --muted:#64748b;
+      --brand:#0ea5e9;
+      --brand-2:#4f46e5;
+      --card:rgba(255,255,255,.9);
+      --ring:rgba(14,165,233,.25);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--ink);
+      background: radial-gradient(1200px 600px at 70% 0%, #ffe08a 0%, rgba(255,224,138,0) 60%),
+                  radial-gradient(800px 400px at 10% 20%, #ffd166 0%, rgba(255,209,102,0) 60%),
+                  var(--bg);
+      display:grid;
+      place-items:center;
+      padding:20px;
+    }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            color: #0f172a;
-        }
+    .wrap{
+      width:min(880px, 100%);
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:18px;
+    }
 
-        .card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            width: 100%;
-            max-width: 400px;
-            padding: 2.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.8);
-        }
+    .hero{
+      position:relative;
+      border-radius: var(--radius);
+      overflow:hidden;
+      height:min(38vh, 280px);
+      background:#f8d566 url('https://siddhannam.com/cdn/shop/files/ChatGPT_Image_Apr_13_2025_08_08_12_PM.webp') center/cover no-repeat;
+      box-shadow: 0 20px 60px rgba(0,0,0,.08);
+      outline:1px solid rgba(255,255,255,.7);
+    }
+    .hero::after{
+      content:"";
+      position:absolute;inset:0;
+      background:linear-gradient(180deg, rgba(255,255,255,.05) 0%, rgba(255,255,255,.6) 70%, rgba(255,255,255,.9) 100%);
+    }
 
-        .title {
-            font-size: 1.25rem;
-            font-weight: 500;
-            color: #64748b;
-            margin-bottom: 0.5rem;
-            text-align: center;
-        }
+    .card{
+      display:flex; gap:18px;
+      justify-content: center;
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:20px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.09);
+      border:1px solid rgba(255,255,255,.85);
+      backdrop-filter: blur(8px);
+    }
 
-        .name {
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
+    .topline{ text-align:center; font-weight:600; color:var(--muted); letter-spacing:.02em }
+    .name{ text-align:center; font-size: clamp(22px, 4vw, 28px); font-weight:800; line-height:1.1; }
+    .amount{ text-align:center; font-size: clamp(34px, 7vw, 44px); font-weight:800;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      -webkit-background-clip:text; background-clip:text; color:transparent; }
 
-        .amount {
-            font-size: 3.5rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 2rem;
-            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+    .grid{ display:grid; gap:16px;}
 
-        .button {
-            display: block;
-            width: 100%;
-            padding: 1.25rem;
-            border-radius: 16px;
-            border: none;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            text-align: center;
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
+    .qrbox{
+      display:grid; place-items:center; padding:16px; background:#ffffff; border-radius:18px; border:1px solid #eef2f7;
+    }
+    #qrcode canvas, #qrcode img{ width: 100% !important; height: auto !important; max-width: 260px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,.08) }
 
-        .button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(255, 255, 255, 0.4),
-                transparent
-            );
-            transition: 0.5s;
-        }
+    .upi{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:14px; word-break:break-all; text-align:center; padding:12px 14px; border-radius:12px;
+      background:#f8fafc; border:1px dashed #dbe3ea; color:#0f172a;
+    }
 
-        .button:hover::before {
-            left: 100%;
-        }
+    .actions{ display:grid; grid-template-columns:1fr; gap:12px; }
+    .row{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px }
 
-        .button-primary {
-            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
-        }
+    .btn{
+      appearance:none; border:0; cursor:pointer; text-decoration:none; text-align:center;
+      font-weight:700; letter-spacing:.02em; padding:14px 16px; border-radius:14px;
+      background:#0ea5e9; color:white; box-shadow:0 10px 24px rgba(14,165,233,.25);
+      transition:transform .06s ease, box-shadow .2s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow:0 16px 30px rgba(14,165,233,.28) }
+    .btn:active{ transform: translateY(0) }
 
-        .button-secondary {
-            background: #f8fafc;
-            color: #334155;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        }
+    .btn.secondary{ background:#ffffff; color:#0f172a; border:1px solid #e5e9f2; box-shadow:0 6px 14px rgba(0,0,0,.05) }
 
-        .button-secondary:hover {
-            background: #f1f5f9;
-            border-color: #cbd5e1;
-        }
+    .btn.gpay{ background:#4285f4 }
+    .btn.phonepe{ background:#5f259f }
+    .btn.paytm{ background:#00b9f1 }
 
-        .upi-id {
-            font-family: 'SF Mono', 'Roboto Mono', monospace;
-            margin: 1.5rem 0;
-            padding: 1rem;
-            background: #f8fafc;
-            border-radius: 12px;
-            text-align: center;
-            word-break: break-all;
-            border: 1px solid #e2e8f0;
-            color: #334155;
-            font-size: 0.9rem;
-        }
+    .hint{ text-align:center; font-size:12.5px; color:var(--muted) }
 
-        /* App-specific buttons */
-        .gpay-button {
-            background: linear-gradient(135deg, #4285f4 0%, #2563eb 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
-        }
+    @media (min-width: 760px){
+      .card{ grid-template-columns: 1.2fr .9fr; align-items:center }
+      .grid{ grid-template-columns: 1fr }
+      .wrap{ gap:22px }
+      .qrbox{ padding:22px }
+    }
 
-        .phonepe-button {
-            background: linear-gradient(135deg, #5f259f 0%, #4c1d95 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(76, 29, 149, 0.2);
-        }
-
-        .paytm-button {
-            background: linear-gradient(135deg, #00b9f1 0%, #0284c7 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.2);
-        }
-
-        /* Hide specific elements based on platform */
-        .android-only, .ios-only {
-            display: none;
-        }
-
-        /* Success animation for copy */
-        @keyframes successPop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
-        }
-
-        .copy-success {
-            animation: successPop 0.3s ease-in-out;
-            background: #f0fdf4;
-            border-color: #86efac;
-            color: #166534;
-        }
-    </style>
+    /* tiny dev test chip (non-intrusive) */
+    #testChip{position:fixed;bottom:10px;right:10px;background:#111;color:#fff;border-radius:999px;padding:6px 10px;font-size:12px;opacity:.15;}
+    #testChip.pass{background:#16a34a}
+    #testChip.fail{background:#dc2626}
+  </style>
 </head>
 <body>
-    <div class="card">
-        <div class="title">Paying to</div>
-        <div class="name" id="payeeName"></div>
-        <div id="amountDisplay" class="amount"></div>
-        
-        <a href="#" id="upiLink" class="button button-primary android-only">
-            Pay Now
-        </a>
-        
-        <div class="ios-only">
-            <a href="#" id="gpayLink" class="button gpay-button">Google Pay</a>
-            <a href="#" id="phonepeLink" class="button phonepe-button">PhonePe</a>
-            <a href="#" id="paytmLink" class="button paytm-button">Paytm</a>
+  <main class="wrap">
+    <header class="hero" aria-label="Siddha Annam brand art"></header>
+
+    <section class="card" aria-live="polite">
+      <div class="grid">
+        <div class="topline">Paying to</div>
+        <div id="payeeName" class="name">Shubham Gupta (Siddhannam)</div>
+        <div id="amountDisplay" class="amount">₹350</div>
+
+        <div class="qrbox">
+          <div id="qrcode" aria-label="UPI QR Code"></div>
         </div>
-        
-        <div class="upi-id" id="upiId"></div>
-        
-        <button onclick="copyUpiId()" class="button button-secondary" id="copyButton">
-            Copy UPI ID
-        </button>
-    </div>
 
-    <script>
-        // Parse URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const pa = urlParams.get('pa') || '';
-        const pn = urlParams.get('pn') || 'Unknown';
-        const am = urlParams.get('am') || '';
-        const cu = urlParams.get('cu') || 'INR';
+        <div id="upiId" class="upi">8905933873@superyes</div>
 
-        // Detect platform
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-        document.body.className = isIOS ? 'ios' : 'android';
+        <div class="actions">
+          <a id="primaryLink" class="btn" href="#">Open in UPI app</a>
+          <div class="row">
+            <a id="gpayLink" class="btn gpay" href="#">Google Pay</a>
+            <a id="phonepeLink" class="btn phonepe" href="#">PhonePe</a>
+            <a id="paytmLink" class="btn paytm" href="#">Paytm</a>
+          </div>
+          <button id="copyBtn" class="btn secondary" type="button">Copy UPI ID</button>
+          <div class="hint" id="platformHint">Scan the QR in any UPI app or tap a button above.</div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-        // Show/hide elements based on platform
-        document.querySelectorAll('.android-only').forEach(el => {
-            el.style.display = isIOS ? 'none' : 'block';
-        });
-        document.querySelectorAll('.ios-only').forEach(el => {
-            el.style.display = isIOS ? 'block' : 'none';
-        });
+  <noscript>
+    <div style="margin:1rem auto;max-width:680px;padding:1rem;border:1px solid #e2e8f0;border-radius:12px;background:#fff">Please enable JavaScript to view the UPI QR code.</div>
+  </noscript>
 
-        // Set content
-        document.getElementById('payeeName').textContent = pn;
-        document.getElementById('upiId').textContent = pa;
-        if (am) {
-            document.getElementById('amountDisplay').textContent = `₹${parseInt(am).toLocaleString('en-IN')}`;
-        } else {
-            document.getElementById('amountDisplay').style.display = 'none';
-        }
+  <div id="testChip" title="Self‑tests"></div>
 
-        // Generate links
-        const baseUpiLink = `upi://pay?pa=${pa}&pn=${pn}${am ? `&am=${am}` : ''}&cu=${cu}`;
-        document.getElementById('upiLink').href = baseUpiLink;
-        document.getElementById('gpayLink').href = `gpay://upi/pay?pa=${pa}&pn=${pn}${am ? `&am=${am}` : ''}&cu=${cu}`;
-        document.getElementById('phonepeLink').href = `phonepe://pay?pa=${pa}&pn=${pn}${am ? `&am=${am}` : ''}&cu=${cu}`;
-        document.getElementById('paytmLink').href = `paytmmp://pay?pa=${pa}&pn=${pn}${am ? `&am=${am}` : ''}&cu=${cu}`;
+  <script>
+    // -------------------- Config & helpers --------------------
+    const DEFAULTS = { pa: '8905933873@superyes', pn: 'Shubham Gupta (Siddhannam)', am: '350', cu: 'INR' };
 
-        // Copy UPI ID function with animation
-        function copyUpiId() {
-            const copyButton = document.getElementById('copyButton');
-            navigator.clipboard.writeText(pa).then(() => {
-                copyButton.textContent = 'Copied!';
-                copyButton.classList.add('copy-success');
-                setTimeout(() => {
-                    copyButton.textContent = 'Copy UPI ID';
-                    copyButton.classList.remove('copy-success');
-                }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy:', err);
-            });
-        }
-    </script>
+    function paramOrDefault(key, dflt){
+      const v = new URLSearchParams(location.search).get(key);
+      return (v === null ? dflt : String(v).trim());
+    }
+
+    function buildUpi(pa, pn, am, cu){
+      const qp = (k,v)=> `${k}=${encodeURIComponent(v)}`;
+      return `upi://pay?${[qp('pa',pa), qp('pn',pn), am?qp('am',am):'', qp('cu',cu)].filter(Boolean).join('&')}`;
+    }
+
+    // Populate content from params/defaults
+    const pa = paramOrDefault('pa', DEFAULTS.pa);
+    const pn = paramOrDefault('pn', DEFAULTS.pn);
+    const am = paramOrDefault('am', DEFAULTS.am);
+    const cu = paramOrDefault('cu', DEFAULTS.cu);
+
+    document.getElementById('payeeName').textContent = pn;
+    document.getElementById('upiId').textContent = pa;
+    if (am) {
+      const n = Number(am);
+      const pretty = isFinite(n) ? n.toLocaleString('en-IN') : am;
+      document.getElementById('amountDisplay').textContent = '₹' + pretty;
+    } else {
+      document.getElementById('amountDisplay').style.display = 'none';
+    }
+
+    const upiLink = buildUpi(pa, pn, am, cu);
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    document.getElementById('platformHint').textContent = isIOS ? 'On iPhone, scan the QR in any UPI app or copy the UPI ID.' : 'Scan the QR in any UPI app or tap a button above.';
+
+    // Set deep links
+    const setHref = (id, href)=> document.getElementById(id).setAttribute('href', href);
+    setHref('primaryLink', upiLink);
+    setHref('gpayLink',   `gpay://upi/pay?${upiLink.split('?')[1]}`);
+    setHref('phonepeLink',`phonepe://pay?${upiLink.split('?')[1]}`);
+    setHref('paytmLink',  `paytmmp://pay?${upiLink.split('?')[1]}`);
+
+    // Copy button
+    const copyBtn = document.getElementById('copyBtn');
+    copyBtn.addEventListener('click', async () => {
+      try{
+        await navigator.clipboard.writeText(pa);
+        copyBtn.textContent = 'Copied ✓';
+        copyBtn.style.boxShadow = `0 0 0 8px var(--ring)`;
+        setTimeout(()=>{ copyBtn.textContent='Copy UPI ID'; copyBtn.style.boxShadow='none'; }, 1400);
+      }catch(e){
+        alert('Copy failed. Long‑press the UPI ID to copy.');
+      }
+    });
+
+    // -------------------- Robust QR loader --------------------
+    async function loadQRCodeLib(){
+      const urls = [
+        'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
+        'https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js',
+        'https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js'
+      ];
+      for (const url of urls){
+        try{
+          await new Promise((resolve, reject)=>{
+            const s = document.createElement('script');
+            s.src = url; s.async = true; s.onload = resolve; s.onerror = reject; document.head.appendChild(s);
+          });
+          if (window.QRCode) return true;
+        }catch(err){ /* try next */ }
+      }
+      return false;
+    }
+
+    function renderQrWithLib(){
+      try{
+        new window.QRCode(document.getElementById('qrcode'), { text: upiLink, width: 260, height: 260, correctLevel: window.QRCode.CorrectLevel.M });
+        return true;
+      }catch(e){ return false; }
+    }
+
+    function renderQrFallbackImg(){
+      // Image fallback via public QR service (no code written by us)
+      const img = new Image();
+      img.alt = 'UPI QR Code';
+      img.decoding = 'async';
+      img.loading = 'lazy';
+      img.src = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(upiLink)}`;
+      document.getElementById('qrcode').appendChild(img);
+    }
+
+    (async () => {
+      let ok = false;
+      if (!window.QRCode){ ok = await loadQRCodeLib(); } else { ok = true; }
+      if (ok && renderQrWithLib()) {
+        // done
+      } else {
+        renderQrFallbackImg();
+      }
+    })();
+
+    // -------------------- Tiny self-tests --------------------
+    (function runTests(){
+      const chip = document.getElementById('testChip');
+      function expect(name, cond){ console[cond? 'log':'error'](`TEST ${cond?'PASS':'FAIL'} — ${name}`); return !!cond; }
+
+      const t1 = expect('buildUpi defaults', buildUpi('8905933873@superyes','Shubham Gupta (Siddhannam)','350','INR') === 'upi://pay?pa=8905933873%40superyes&pn=Shubham%20Gupta%20(Siddhannam)&am=350&cu=INR');
+      const t2 = expect('buildUpi encodes spaces', buildUpi('x@y','A B', '1','INR').includes('pn=A%20B'));
+      const t3 = expect('links set', document.getElementById('primaryLink').href.length > 0);
+
+      const passed = t1 && t2 && t3;
+      chip.className = 'pass' + (passed?' pass':' fail');
+      chip.textContent = passed ? 'tests: pass' : 'tests: fail';
+    })();
+  </script>
 </body>
 </html>
